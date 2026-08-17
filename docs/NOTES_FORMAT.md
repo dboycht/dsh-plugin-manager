@@ -16,6 +16,7 @@
 ```jsonc
 {
   "version": 1,            // 格式版本（当前固定 1）
+  "enabled": true,         // 插件管理总开关（v1.0.2 新增；缺省 true。false 时所有写操作被拒绝）
   "notes": {
     "<key>": {
       "note": "备注文本（最长 4000 字符）",

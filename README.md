@@ -11,7 +11,8 @@ Plugin manager for DeepSeek Harness: list every plugin, keep durable per-plugin 
 - **导出 / 导入**：一键备份/恢复全部备注（JSON）。
 - **筛选**：按关键字 + 状态（运行中 / 已启用 / 禁用或已停止 / 失败 / 有备注）过滤。
 - **动态插件启停**：对动态 Cordis 插件一键启动/停止。
-- **模型工具**：注册 `plugin_manager` 工具，代理可直接在对话中读写备注（`list/get/set/remove/export/import/start/stop`）。
+- **总开关**：一键停用/启用整个插件管理（状态持久化；停用后所有写操作被拒绝，重新启用即恢复）。
+- **模型工具**：注册 `plugin_manager` 工具，代理可直接在对话中读写备注（`list/get/set/remove/export/import/start/stop/enable/disable`）。
 - **设置页**：设置 → 插件 → 「备注」标签页。
 
 ## 安装 / Installation
@@ -90,6 +91,7 @@ Plugin manager for DeepSeek Harness: list every plugin, keep durable per-plugin 
 | POST | `/import` | 导入备注 `{json}`（覆盖） |
 | POST | `/stop` | 停止动态插件 `{pluginId, agentId}` |
 | POST | `/start` | 启动动态插件 `{pluginId, agentId, packageId}` |
+| POST | `/enable` | 启停插件管理 `{enabled: true/false}` |
 
 ## 卸载 / Uninstall
 

@@ -1,6 +1,6 @@
 {
   "name": "@dsh-external/dsh-plugin-manager",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "DeepSeek Harness plugin manager: list every plugin (deployment + dynamic Cordis), keep per-plugin notes persisted to disk, export/import notes for backup, and start/stop dynamic plugins — with a Settings UI tab and a plugin_manager model tool.",
   "keywords": [
     "deepseek",
