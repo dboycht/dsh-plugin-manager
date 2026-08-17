@@ -1,0 +1,11 @@
+# dsh-plugin-manager bundle patch: mounts the plugin into a profile layer stack.
+# Add the package to a profile's `dsh.profile.bundles` (or its own dependency
+# list) and this row is inserted automatically. Users can also add the row
+# manually to a profile's cordis.patch.yml:
+#
+#   - insert:
+#       - id: plugin-manager
+#         name: '@dsh-external/dsh-plugin-manager'
+- insert:
+    - id: plugin-manager
+      name: '@dsh-external/dsh-plugin-manager'
