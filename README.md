@@ -7,12 +7,13 @@ Plugin manager for DeepSeek Harness: list every plugin, keep durable per-plugin 
 ## 功能 / Features
 
 - **插件清单**：枚举全部**部署插件**（Cordis Loader，含启用状态与运行阶段）和全部**动态 Cordis 插件**（含包名、用途、运行状态）。
+- **一键禁用/启用部署插件**：设置页每个部署插件行都有「禁用 / 启用」开关（模型工具用 `toggle-deployment`），点击写入当前 profile 的 `cordis.patch.yml`（`disabled: true|false`），利用 Loader 的按 id 合并语义与 patch 热重载**即时生效，无需重启**。
 - **备注管理**：为每个插件添加/编辑/删除备注，持久化到 `<工作目录>/.dsh-plugin-notes.json`（UTF-8，重启不丢；支持历史位置回退读取 + 自动迁移）。
 - **导出 / 导入**：一键备份/恢复全部备注（JSON）。
 - **筛选**：按关键字 + 状态（运行中 / 已启用 / 禁用或已停止 / 失败 / 有备注）过滤。
 - **动态插件启停**：对动态 Cordis 插件一键启动/停止。
 - **总开关**：一键停用/启用整个插件管理（状态持久化；停用后所有写操作被拒绝，重新启用即恢复）。
-- **模型工具**：注册 `plugin_manager` 工具，代理可直接在对话中读写备注（`list/get/set/remove/export/import/start/stop/enable/disable`）。
+- **模型工具**：注册 `plugin_manager` 工具，代理可直接在对话中读写备注与启停插件（`list/get/set/remove/export/import/start/stop/toggle-deployment/enable/disable`）。
 - **设置页**：设置 → 插件 → 「备注」标签页。
 
 ## 安装 / Installation
@@ -57,8 +58,8 @@ Plugin manager for DeepSeek Harness: list every plugin, keep durable per-plugin 
 
 ## 使用 / Usage
 
-- **界面**：设置 → 插件 → 「备注」。每个插件一行：备注文本框 + 保存 / 删除备注；动态插件还有 启动 / 停止 按钮。
-- **对话**：直接对代理说「给 XX 插件加个备注」「导出我的插件备注」，代理会调用 `plugin_manager` 工具。
+- **界面**：设置 → 插件 → 「备注」。每个插件一行：备注文本框 + 保存 / 删除备注；**部署插件还有 禁用 / 启用 开关**（写入 profile patch，热重载即时生效）；动态插件还有 启动 / 停止 按钮。
+- **对话**：直接对代理说「给 XX 插件加个备注」「导出我的插件备注」「禁用 XX 插件」「启用 XX 插件」，代理会调用 `plugin_manager` 工具。
 
 ## 备注文件格式 / Notes file format
 
@@ -89,9 +90,21 @@ Plugin manager for DeepSeek Harness: list every plugin, keep durable per-plugin 
 | POST | `/save` | 保存备注 `{key, note}` |
 | POST | `/remove` | 删除备注 `{key}` |
 | POST | `/import` | 导入备注 `{json}`（覆盖） |
+| POST | `/set-deployment` | 禁用/启用部署插件 `{id, enabled}`（写 profile patch，热重载生效） |
 | POST | `/stop` | 停止动态插件 `{pluginId, agentId}` |
 | POST | `/start` | 启动动态插件 `{pluginId, agentId, packageId}` |
 | POST | `/enable` | 启停插件管理 `{enabled: true/false}` |
+
+### 部署插件禁用/启用原理
+
+Loader 按 id 逐字段合并 patch（`applyEntryPatches`：`target[key] = value`），所以只需在 profile 的 `cordis.patch.yml` 写入：
+
+```yaml
+- id: <entryId>
+  disabled: true
+```
+
+即可让该插件行 `disabled: true` 而不影响 bundle 层提供的 `name` / `config`。DSH 的 `watchUserPatches` 监视 patch 文件变化并热重载，因此**保存即生效，无需重启**。本插件定位当前 profile 的 patch 文件（优先 `ctx.baseUrl` 推断的 profile 目录，回退 `$DSH_HOME/cordis.patch.yml`），以**行级编辑**只改动目标行的 `disabled` 字段，其余内容（含 `!!js` 表达式）逐字节保留。
 
 ## 卸载 / Uninstall
 
